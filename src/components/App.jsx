@@ -44,37 +44,23 @@ export class App extends Component {
     try {
       const { search, currentPage } = this.state;
       const prevSearch = prevState.search;
-      const PrevPage = prevState.currentPage;
+      const prevPage = prevState.currentPage;
 
-      if (prevSearch !== search) {
+      if (prevSearch !== search || prevPage !== currentPage) {
+        const { hits } = await fetchImages(search, currentPage);
         this.setState({
           status: 'pending',
-          currentPage: 1,
           currentScoreImages: 0,
         });
 
-        const { hits, totalHits } = await fetchImages(search);
-
-        this.setState({
-          images: hits,
-          totalHits,
+        this.setState(prevState => ({
+          images: [...new Map([...prevState.images, ...hits].map(image => [image.id, image])).values()],
           status: 'resolve',
-        });
+        }));
 
         if (hits.length === 0) {
           toast.info(`on request ${search} Nothing found`);
         }
-      }
-
-      if (PrevPage !== currentPage && currentPage !== 1) {
-        this.setState({ status: 'pending' });
-
-        const { hits } = await fetchImages(search, currentPage);
-
-        this.setState(prevState => ({
-          images: [...prevState.images, ...hits],
-          status: 'resolve',
-        }));
       }
     } catch (error) {
       this.setState({ status: 'reject' });
@@ -83,7 +69,7 @@ export class App extends Component {
   }
 
   handleSearchValue = (value, { resetForm }) => {
-    this.setState({ search: value.search });
+    this.setState({ search: value.search, currentPage: 1, images: [] });
 
     resetForm();
   };
