@@ -47,14 +47,19 @@ export class App extends Component {
       const prevPage = prevState.currentPage;
 
       if (prevSearch !== search || prevPage !== currentPage) {
-        const { hits } = await fetchImages(search, currentPage);
+        const { hits, totalHits } = await fetchImages(search, currentPage);
         this.setState({
           status: 'pending',
           currentScoreImages: 0,
         });
 
         this.setState(prevState => ({
-          images: [...new Map([...prevState.images, ...hits].map(image => [image.id, image])).values()],
+          images: [
+            ...new Map(
+              [...prevState.images, ...hits].map(image => [image.id, image])
+            ).values(),
+          ],
+          totalHits,
           status: 'resolve',
         }));
 
@@ -89,7 +94,6 @@ export class App extends Component {
   render() {
     const { images, status, showModal, currentImage, totalHits } = this.state;
     const currentScoreImages = images.length;
-
     return (
       <AppWrap>
         <Searchbar onSubmit={this.handleSearchValue} />
