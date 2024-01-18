@@ -101,7 +101,7 @@ export class App extends Component {
 
         {status === 'pending' && <Loader />}
 
-        {status === 'resolve' && currentScoreImages < totalHits && (
+        {currentScoreImages < totalHits && (
           <Button onClick={this.handleNextPageClick} />
         )}
 

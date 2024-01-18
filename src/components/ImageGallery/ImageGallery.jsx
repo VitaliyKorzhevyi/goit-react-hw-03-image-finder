@@ -25,4 +25,4 @@ ImageGallery.propTypes = {
       id: PropTypes.number.isRequired,
     })
   ),
-};
+}
